@@ -1,0 +1,12 @@
+#!/bin/bash
+if [ $# -ne 1 ]; then
+  echo "Utilizzo: $0 <comando>"
+  exit 1
+fi
+$1
+if [ $? -eq 0 ]; then
+    curl -d "$2 Eseguito con successo"
+else
+    curl -d "$2 Fallito"
+fi
+exit 1
