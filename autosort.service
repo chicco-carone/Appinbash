@@ -1,0 +1,9 @@
+[Unit]
+Description=Script per la suddivisione dei file di download
+
+[Service]
+Type=simple
+ExecStart=/bin/bash /home/chicco/.local/bin/autosort                  
+
+[Install]
+WantedBy=multi-user.target
