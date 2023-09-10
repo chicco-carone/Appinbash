@@ -1,43 +1,32 @@
 #!/bin/bash
 
-# Directory dei download
 download_dir="/home/chicco/Downloads/"
-# Directory di destinazione per i file audio
 audio_dir="$download_dir/audio"
-# Directory di destinazione per i file immagine
 image_dir="$download_dir/image"
-# Directory di destinazione per i file di archivio
 archive_dir="$download_dir/archive"
-# Directory di destinazione per i file di codice
 code_dir="$download_dir/code"
-# Directory di destinazione per i file senza categoria
 uncategorized_dir="$download_dir/uncategorized"
-# Directory di destinazione per i file .osr se osu.exe è in esecuzione
 osu_dir="/home/chicco/.local/share/osu-wine/osu!/Songs"
-# Directory di destinazione per i file di testo (Word, Excel, PowerPoint, TXT)
 text_dir="$download_dir/text"
-# Directory di destinazione per i file AppImage
 appimage_dir="$download_dir/appimages"
+video_dir="$download_dir/videos"
+windows_dir="$download_dir/windows"
 
-# Crea le directory di destinazione se non esistono
-mkdir -p "$audio_dir" "$image_dir" "$archive_dir" "$code_dir" "$uncategorized_dir" "$osu_dir" "$text_dir" "$appimage_dir"
+mkdir -p "$audio_dir" "$image_dir" "$archive_dir" "$code_dir" "$uncategorized_dir" "$osu_dir" "$text_dir" "$appimage_dir" "$video_dir" "$windows_dir"
 
-# Inizializza il file di log
 log_file="$download_dir/download_log.txt"
 echo "Inizio del processo di suddivisione dei file." > "$log_file"
 
-# Elenca i formati di file audio, immagine, archivio e codice
 audio_formats=("mp3" "wav" "flac")
 image_formats=("jpg" "jpeg" "png" "gif")
-archive_formats=("zip" "rar" "tar.gz")
-code_formats=("ah" "c" "cpp" "py" "html" "css" "ino")
-# Elenca i formati di file di testo (Word, Excel, PowerPoint, TXT)
-text_formats=("doc" "docx" "xls" "xlsx" "ppt" "pptx" "txt")
-# Elenca i formati di file AppImage
-appimage_formats=("appimage")
+video_formats=("mp4")
+archive_formats=("zip" "rar" "tar.gz" "tar.xz" "jar" "iso")
+code_formats=("sh" "c" "cpp" "py" "html" "css" "ino")
+text_formats=("doc" "docx" "xls" "xlsx" "ppt" "pptx" "txt" "pdf")
+appimage_formats=("AppImage")
+windows_formats=( "exe" "msi" )
 
 while true; do
-  # Sposta i file nei rispettivi percorsi e registra il log
   for file in "$download_dir"/*; do
     if [[ -f "$file" ]]; then
       filename=$(basename "$file")
@@ -49,14 +38,19 @@ while true; do
       elif [[ "${image_formats[*]}" =~ "$extension" ]]; then
         mv "$file" "$image_dir/$filename"
         echo "Spostato $filename in $image_dir" >> "$log_file"
+      elif [[ "${video_formats[*]}" =~ "$extension" ]]; then
+        mv "$file" "$video_dir/$filename"
+        echo "Spostato $filename in $video_dir" >> "$log_file"
       elif [[ "${archive_formats[*]}" =~ "$extension" ]]; then
         mv "$file" "$archive_dir/$filename"
         echo "Spostato $filename in $archive_dir" >> "$log_file"
       elif [[ "${code_formats[*]}" =~ "$extension" ]]; then
         mv "$file" "$code_dir/$filename"
         echo "Spostato $filename in $code_dir" >> "$log_file"
+      elif [[ "${windows_formats[*]}" =~ "$extension" ]]; then
+        mv "$file" "$windows_dir/$filename"
+        echo "Spostato $filename in $windows_dir" >> "$log_file"
       elif [[ "$extension" == "osr" ]]; then
-        # Controlla se osu.exe è in esecuzione
         if pgrep -x "osu.exe" > /dev/null; then
           mv "$file" "$osu_dir/$filename"
           echo "Spostato $filename in $osu_dir perché osu.exe è in esecuzione" >> "$log_file"
@@ -71,9 +65,8 @@ while true; do
         mv "$file" "$appimage_dir/$filename"
         echo "Spostato $filename in $appimage_dir" >> "$log_file"
       else
-        # Controlla se il file è una cartella o un file temporaneo di Chrome/FDM
-        if [[ -d "$file" || "$filename" == "crdownload" || "$filename" == "FDM_Part" ]]; then
-          continue  # Salta le cartelle e i file temporanei
+        if [[ -d "$file" || "$filename" == "crdownload" || "$filename" == "torrent" ]]; then
+          continue
         else
           mv "$file" "$uncategorized_dir/$filename"
           echo "Spostato $filename in $uncategorized_dir" >> "$log_file"
